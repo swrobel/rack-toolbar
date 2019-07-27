@@ -52,14 +52,18 @@ EOS
       if okay_to_modify?
         body = ""
         @response.each {|part| body << part }
-        index = body.rindex(@options[:insertion_point])
-        if index
-          if @options[:insertion_method] != :before
-            index += @options[:insertion_point].length
+        title_index = body.index('<title>')
+        page_title = title_index && body[(title_index + 7)..(body.index('</title>') - 1)]
+        if page_title == 'Action Controller: Exception caught'
+          index = body.rindex(@options[:insertion_point])
+          if index
+            if @options[:insertion_method] != :before
+              index += @options[:insertion_point].length
+            end
+            body.insert(index, render)
+            @headers["Content-Length"] = body.bytesize.to_s
+            @response = [body]
           end
-          body.insert(index, render)
-          @headers["Content-Length"] = body.bytesize.to_s
-          @response = [body]
         end
       end
       @response.each(&block)
