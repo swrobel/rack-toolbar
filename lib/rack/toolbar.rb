@@ -53,8 +53,9 @@ EOS
         body = ""
         @response.each {|part| body << part }
         title_index = body.index('<title>')
+        dt_index = body.index('<dt>From:</dt>')
         page_title = title_index && body[(title_index + 7)..(body.index('</title>') - 1)]
-        if page_title == 'Action Controller: Exception caught'
+        if dt_index || ['Action Controller: Exception caught', 'Mailer Previews'].include?(page_title)
           index = body.rindex(@options[:insertion_point])
           if index
             if @options[:insertion_method] != :before
